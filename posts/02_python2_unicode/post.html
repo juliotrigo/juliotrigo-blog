@@ -1,0 +1,220 @@
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #0044DD">Traceback (most recent call last):</span>
+  File <span style="color: #008000">&quot;&lt;stdin&gt;&quot;</span>, line <span style="color: #666666">1</span>, in &lt;module&gt;
+<span style="color: #FF0000">UnicodeEncodeError</span>: &#39;ascii&#39; codec can&#39;t encode character u&#39;\u03b1&#39; </br>in position 0: ordinal not in range(128)
+</pre></div>
+</p>
+
+<p>Does this Python exception look familiar? Most Python developers have seen this at least once.</p>
+
+<p>Character sets, encodings, Unicode and all that stuff are hard to deal with until you fully understand what is going on behind the scenes. Please find below a few web pages that I find essential:</p>
+
+<a href="http://www.joelonsoftware.com/articles/Unicode.html">The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)</a> by Joel Spolsky</p>
+
+<a href="https://docs.python.org/2/howto/unicode.html">Unicode HOWTO &mdash; Python 2.7.9 documentation</a></p>
+
+<a href="https://docs.python.org/2/library/codecs.html#encodings-and-unicode">7.8. codecs — Codec registry and base classes &mdash; Python 2.7.9 documentation</a></p>
+
+<p>What I am going to do is to provide some Unicode and bytestring examples using Python 2 to help understand them better.</p>
+
+<p>Let's say that we want to work with some Greek characters, which cannot be represented in ASCII (0-127): α β γ ε ...</p>
+
+<p>We can start creating them as Unicode characters.</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>a <span style="color: #666666">=</span> <span style="color: #BA2121">u&#39;</span><span style="color: #BB6622; font-weight: bold">\u03b1</span><span style="color: #BA2121">&#39;</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>b <span style="color: #666666">=</span> <span style="color: #BA2121">u&#39;</span><span style="color: #BB6622; font-weight: bold">\u03b2</span><span style="color: #BA2121">&#39;</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>g <span style="color: #666666">=</span> <span style="color: #BA2121">u&#39;</span><span style="color: #BB6622; font-weight: bold">\u03b3</span><span style="color: #BA2121">&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>a, b, g
+<span style="color: #888888">(u&#39;\u03b1&#39;, u&#39;\u03b2&#39;, u&#39;\u03b3&#39;)</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">print</span> a, b, g
+<span style="color: #888888">α β γ</span>
+</pre></div>
+</p>
+
+<p>In <strong>Unicode</strong>, characters are represented by code points: integer values usually denoted in base 16.</p>
+
+<p>We cannot represent them using the <strong>ASCII</strong> character-encoding scheme (7 bits, 0-127), which is the default encoding in Python 2. So it is the one used (by default) when converting Unicode characters into bytestrings (str in Python 2).</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;{}{}{}{}&#39;</span><span style="color: #666666">.</span>format(a, b, g, <span style="color: #BA2121">&#39;d&#39;</span>)
+<span style="color: #0044DD">Traceback (most recent call last):</span>
+  File <span style="color: #008000">&quot;&lt;stdin&gt;&quot;</span>, line <span style="color: #666666">1</span>, in &lt;module&gt;
+<span style="color: #FF0000">UnicodeEncodeError</span>: &#39;ascii&#39; codec can&#39;t encode character u&#39;\u03b1&#39; </br>in position 0: ordinal not in range(128)
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet <span style="color: #666666">=</span> <span style="color: #BA2121">u&#39;{}{}{}{}&#39;</span><span style="color: #666666">.</span>format(a, b, g, <span style="color: #BA2121">&#39;d&#39;</span>)
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet
+<span style="color: #888888">u&#39;\u03b1\u03b2\u03b3d&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">print</span> alphabet
+<span style="color: #888888">αβγd</span>
+</pre></div>
+</p>
+
+<p>A Unicode string is a sequence of code points (integers). In order to represent Unicode strings as a sequence of bytes we need to encode them using a character encoding. <strong>UTF-8</strong> is a character encoding capable of encoding all possible code points in Unicode.</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet_str <span style="color: #666666">=</span> alphabet<span style="color: #666666">.</span>encode(<span style="color: #BA2121">&#39;utf-8&#39;</span>)
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet_str
+<span style="color: #888888">&#39;\xce\xb1\xce\xb2\xce\xb3d&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">print</span> alphabet_str
+<span style="color: #888888">αβγd</span>
+</pre></div>
+</p>
+
+<p>Now, we have a Python str (UTF-8 encoding): a sequence of bytes representing the Unicode characters.</p>
+
+<p>If a character encoding is not specified, then the <strong>encode</strong> method will assume that we want to use ASCII and will fail because those characters cannot be represented in ASCII.</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet_str <span style="color: #666666">=</span> alphabet<span style="color: #666666">.</span>encode()
+<span style="color: #0044DD">Traceback (most recent call last):</span>
+  File <span style="color: #008000">&quot;&lt;stdin&gt;&quot;</span>, line <span style="color: #666666">1</span>, in &lt;module&gt;
+<span style="color: #FF0000">UnicodeEncodeError</span>: &#39;ascii&#39; codec can&#39;t encode characters </br>in position 0-2: ordinal not in range(128)
+</pre></div>
+</p>
+
+<p>We cannot represent those characters in <strong>latin-1 (ISO-8859-1)</strong> either.</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet_str <span style="color: #666666">=</span> alphabet<span style="color: #666666">.</span>encode(<span style="color: #BA2121">&#39;latin-1&#39;</span>)
+<span style="color: #0044DD">Traceback (most recent call last):</span>
+  File <span style="color: #008000">&quot;&lt;stdin&gt;&quot;</span>, line <span style="color: #666666">1</span>, in &lt;module&gt;
+<span style="color: #FF0000">UnicodeEncodeError</span>: &#39;latin-1&#39; codec can&#39;t encode characters </br>in position 0-2: ordinal not in range(256)
+</pre></div>
+</p>
+
+<p>And, as we expect, we also get an error if we try to decode the Unicode string (which does not make sense).</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet_str <span style="color: #666666">=</span> alphabet<span style="color: #666666">.</span>decode(<span style="color: #BA2121">&#39;utf-8&#39;</span>)
+<span style="color: #0044DD">Traceback (most recent call last):</span>
+  File <span style="color: #008000">&quot;&lt;stdin&gt;&quot;</span>, line <span style="color: #666666">1</span>, in &lt;module&gt;
+  File <span style="color: #008000">&quot;/System/Library/Frameworks/Python.framework/Versions/</br>2.7/lib/python2.7/encodings/utf_8.py&quot;</span>, line <span style="color: #666666">16</span>, in decode
+    <span style="color: #008000; font-weight: bold">return</span> codecs<span style="color: #666666">.</span>utf_8_decode(<span style="color: #008000">input</span>, errors, <span style="color: #008000">True</span>)
+<span style="color: #FF0000">UnicodeEncodeError</span>: &#39;ascii&#39; codec can&#39;t encode characters </br>in position 0-2: ordinal not in range(128)
+</pre></div>
+</p>
+
+<p>Once we have the bytestring, we can <strong>decode</strong> it using the UTF-8 character encoding, and get back the original Unicode string.</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet_u <span style="color: #666666">=</span> alphabet_str<span style="color: #666666">.</span>decode(<span style="color: #BA2121">&#39;utf-8&#39;</span>)
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet_u
+<span style="color: #888888">u&#39;\u03b1\u03b2\u03b3d&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">print</span>(alphabet_u)
+<span style="color: #888888">αβγd</span>
+</pre></div>
+</p>
+
+<p>Again, we cannot encode a bytestring that was already encoded using UTF-8 (it does not make sense either).</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet_u <span style="color: #666666">=</span> alphabet_str<span style="color: #666666">.</span>encode(<span style="color: #BA2121">&#39;utf-8&#39;</span>)
+<span style="color: #0044DD">Traceback (most recent call last):</span>
+  File <span style="color: #008000">&quot;&lt;stdin&gt;&quot;</span>, line <span style="color: #666666">1</span>, in &lt;module&gt;
+<span style="color: #FF0000">UnicodeDecodeError</span>: &#39;ascii&#39; codec can&#39;t decode byte 0xce </br>in position 0: ordinal not in range(128)
+</pre></div>
+</p>
+
+<p>We can see that all those variables have different types:</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">type</span>(alphabet)
+<span style="color: #888888">&lt;type &#39;unicode&#39;&gt;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">type</span>(alphabet_str)
+<span style="color: #888888">&lt;type &#39;str&#39;&gt;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">type</span>(alphabet_u)
+<span style="color: #888888">&lt;type &#39;unicode&#39;&gt;</span>
+</pre></div>
+</p>
+
+<p>And different lengths.</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">len</span>(alphabet_str)
+<span style="color: #888888">7</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">len</span>(alphabet_u)
+<span style="color: #888888">4</span>
+</pre></div>
+</p>
+
+<p>So, in order to convert types:</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #888888">&lt;type &#39;str&#39;&gt; to &lt;type &#39;unicode&#39;&gt;</span>
+
+<span style="color: #888888">    s.decode(encoding)</span>
+
+<span style="color: #888888">&lt;type &#39;unicode&#39;&gt; to &lt;type &#39;str&#39;&gt;</span>
+
+<span style="color: #888888">    u.encode(encoding)</span>
+</pre></div>
+</p>
+
+<p>Additionally, we need to keep in mind that we can write Unicode literals in any encoding using Python. In order to do that, we have to declare the encoding being used by including a special comment as either the first or second line of the source file.</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #888888"># -*- coding: latin-1 -*-</span>
+
+<span style="color: #888888"># -*- coding: utf-8 -*-</span>
+</pre></div>
+</p>
+
+<p>Unicode literals are written as strings prefixed with the 'u' or 'U' character.</p>
+
+<p>Below, we can see some examples of how the same string could be a Unicode or a bytestring string just depending on whether we write it as a Unicode literal or not.</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #BA2121">u&#39;ε&#39;</span>
+<span style="color: #888888">u&#39;\u03b5&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #BA2121">&#39;ε&#39;</span>
+<span style="color: #888888">&#39;\xce\xb5&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet2 <span style="color: #666666">=</span> <span style="color: #BA2121">u&#39;{}{}{}{}&#39;</span><span style="color: #666666">.</span>format(a, b, g, <span style="color: #BA2121">u&#39;ε&#39;</span>)
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet2
+<span style="color: #888888">u&#39;\u03b1\u03b2\u03b3\u03b5&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet2 <span style="color: #666666">=</span> <span style="color: #BA2121">u&#39;{}{}{}{}&#39;</span><span style="color: #666666">.</span>format(a, b, g, <span style="color: #BA2121">&#39;ε&#39;</span><span style="color: #666666">.</span>decode(<span style="color: #BA2121">&#39;utf-8&#39;</span>))
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet2
+<span style="color: #888888">u&#39;\u03b1\u03b2\u03b3\u03b5&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">print</span> alphabet2
+<span style="color: #888888">αβγε</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>alphabet2 <span style="color: #666666">=</span> <span style="color: #BA2121">u&#39;{}{}{}{}&#39;</span><span style="color: #666666">.</span>format(a, b, g, <span style="color: #BA2121">&#39;ε&#39;</span>)
+<span style="color: #0044DD">Traceback (most recent call last):</span>
+  File <span style="color: #008000">&quot;&lt;stdin&gt;&quot;</span>, line <span style="color: #666666">1</span>, in &lt;module&gt;
+<span style="color: #FF0000">UnicodeDecodeError</span>: &#39;ascii&#39; codec can&#39;t decode byte 0xce </br>in position 0: ordinal not in range(128)
+</pre></div>
+</p>
+
+<p>Finally, we can see how we may get different bytestrings when encoding the same Unicode string using different character encodings.</p>
+
+<p>
+<div class="highlight" style="background: #f8f8f8"><pre style="padding: 20px 20px 20px 20px; line-height: 125%"><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #BA2121">u&#39;nona&#39;</span><span style="color: #666666">.</span>encode(<span style="color: #BA2121">&#39;utf-8&#39;</span>)
+<span style="color: #888888">&#39;nona&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #BA2121">u&#39;nona&#39;</span><span style="color: #666666">.</span>encode(<span style="color: #BA2121">&#39;latin-1&#39;</span>)
+<span style="color: #888888">&#39;nona&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #BA2121">u&#39;ñóñà&#39;</span><span style="color: #666666">.</span>encode(<span style="color: #BA2121">&#39;utf-8&#39;</span>)
+<span style="color: #888888">&#39;\xc3\xb1\xc3\xb3\xc3\xb1\xc3\xa0&#39;</span>
+
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #BA2121">u&#39;ñóñà&#39;</span><span style="color: #666666">.</span>encode(<span style="color: #BA2121">&#39;latin-1&#39;</span>)
+<span style="color: #888888">&#39;\xf1\xf3\xf1\xe0&#39;</span>
+</pre></div>
+</p>
