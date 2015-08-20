@@ -1,0 +1,259 @@
+<div style="text-align: justify;">
+The aim of this article is to explain how to deploy a Django site with Apache and WSGI on Linux (Ubuntu), considering that neither apache2 nor mod_wsgi have been previously installed in the system. I will use the deployment of my personal website as an example.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="font-size: large;"><b>WSGI</b></span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<a href="http://wsgi.readthedocs.org/">WSGI</a> (Web Server Gateway Interface) is the Python standard (<a href="http://www.python.org/dev/peps/pep-3333/">PEP 3333</a>) for web servers and applications. It is a specification that describes how web servers communicate with web applications.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+There are many frameworks that support WSGI. Django and Flask are two of them.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="font-size: large;"><b>HTTPD - Apache2 Web Server</b></span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<a href="http://httpd.apache.org/">Apache</a> is the most commonly used Web Server on Linux. It can be installed using apt-get:</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ sudo apt-get install apache2</span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+We can check the Apache version by doing:</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ /usr/sbin/apache2 -v</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">Server version: Apache/2.4.6 (Ubuntu)</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">Server built: Dec 5 2013 18:32:22</span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+The Apache setup files will be placed in <span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">/etc/apache2/</span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="font-size: large;"><b>mod_wsgi</b></span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<a href="https://code.google.com/p/modwsgi/">mod_wsgi</a> is an Apache module that can host any Python application which supports the Python WSGI interface.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+mod_wsgi has two primary modes of operation:</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<ul>
+<li><i>Embedded mode</i></li>
+<ul>
+<li>WSGI applications run within the actual Apache child processes.&nbsp;</li>
+<li>WSGI applications share the same processes as other Apache hosted applications.</li>
+</ul>
+<li><i>Daemon mode</i>&nbsp;</li>
+<ul>
+<li>Available with Apache 2.X on UNIX.</li>
+<li>WSGI applications run in separate dedicated processes.&nbsp;</li>
+<li>It is the recommended mode for running mod_wsgi.&nbsp;</li>
+</ul>
+</ul>
+</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+The <a href="http://packages.debian.org/unstable/python/libapache2-mod-wsgi">wsgi module</a> can also be installed in Ubuntu using apt-get:</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ sudo apt-get install libapache2-mod-wsgi</span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+Apache automatically enables mod_wsgi once the module is installed.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+We can see that mod_wsgi is now enabled:</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ ls /etc/apache2/mods-enabled</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">…</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">wsgi.conf</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">wsgi.load</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">…</span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="font-size: large;"><b>Apache VirtualHost</b></span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+At this point, we need to create a new <span style="font-family: Courier New, Courier, monospace;">VirtualHost</span> in Apache (we can use the default site as a template).</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ cd /etc/apache2/sites-available</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ sudo cp 000-default.conf juliotrigo.conf</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ vim juliotrigo.conf</span></div>
+<div style="text-align: justify;">
+<br />
+<br /></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;"><span style="color: #b45f06;">&lt;VirtualHost</span> <span style="color: #990000;">*:80</span></span><span style="background-color: white; color: #b45f06; font-family: Courier New, Courier, monospace;">&gt;</span><br />
+<span style="background-color: white;"><span style="font-family: Courier New, Courier, monospace;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace;">&nbsp; <span style="color: #134f5c;">ServerName</span> juliotrigo.com</span></span><br />
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; <span style="color: #134f5c;">ServerAlias</span> www.juliotrigo.com</span><br />
+<span style="background-color: white; font-family: Courier New, Courier, monospace;"><br /></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;"><span style="color: #073763;">&nbsp; </span><span style="color: #134f5c;">WSGIScriptAlias</span> / /path/to/juliotrigo.com/juliotrigo/wsgi.py</span></div>
+<div style="text-align: left;">
+<span style="background-color: white;"><span style="font-family: Courier New, Courier, monospace;"><span style="color: #073763;">&nbsp; </span><span style="color: #134f5c;">WSGIDaemonProcess</span> juliotrigo.com user=myuser group=myuser&nbsp;</span><span style="font-family: Courier New, Courier, monospace;">processes=2 threads=15&nbsp;</span><span style="font-family: 'Courier New', Courier, monospace;">python-path=/path/to/juliotrigo.com:</span><span style="font-family: 'Courier New', Courier, monospace;">/home</span><span style="font-family: 'Courier New', Courier, monospace;">/myuser/.virtualenvs/juliotrigo/lib/python2.7/site-packages</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;"><span style="color: #073763;">&nbsp; </span><span style="color: #134f5c;">WSGIProcessGroup</span> juliotrigo.com</span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;"><br /></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; <span style="color: #b45f06;">&lt;Directory</span> <span style="color: #990000;">/path/to/juliotrigo.com/juliotrigo</span><span style="color: #b45f06;">&gt;</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; &nbsp; <span style="color: #b45f06;">&lt;Files</span> <span style="color: #990000;">wsgi.py</span><span style="color: #b45f06;">&gt;</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white;"><span style="font-family: Courier New, Courier, monospace;">&nbsp; &nbsp; &nbsp; <span style="color: #741b47;">Order</span>&nbsp;</span><span style="color: #990000;"><span style="font-family: 'Courier New', Courier, monospace;">allow</span><span style="font-family: 'Courier New', Courier, monospace;">,</span><span style="font-family: 'Courier New', Courier, monospace;">deny</span></span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; &nbsp; &nbsp; <span style="color: #134f5c;">Require</span> <span style="color: #990000;">all granted</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; &nbsp; <span style="color: #b45f06;">&lt;/Files&gt;</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; color: #b45f06; font-family: Courier New, Courier, monospace;">&nbsp; &lt;/Directory&gt;</span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;"><br /></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; <span style="color: #134f5c;">Alias</span> /favicon.ico /var/www/juliotrigo/static/img/favicon.ico</span><br />
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; <span style="color: #134f5c;">Alias</span> /static/ /var/www/juliotrigo/static/</span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;"><br /></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; <span style="color: #b45f06;">&lt;Directory</span> <span style="color: #990000;">/var/www/juliotrigo/static</span><span style="color: #b45f06;">&gt;</span></span><br />
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; &nbsp; <span style="color: #134f5c;">Options</span> <span style="color: #990000;">-Indexes</span></span><br />
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; &nbsp; <span style="color: #134f5c;">AllowOverride</span> <span style="color: #990000;">None</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; &nbsp; <span style="color: #741b47;">Order</span> <span style="color: #990000;">deny,allow</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; &nbsp; <span style="color: #741b47;">Allow from</span> <span style="color: #134f5c;">all</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; font-family: Courier New, Courier, monospace;">&nbsp; <span style="color: #b45f06;">&lt;/Directory&gt;</span></span><br />
+<span style="background-color: white; font-family: Courier New, Courier, monospace;"><br /></span></div>
+<div style="text-align: justify;">
+<span style="background-color: white; color: #b45f06; font-family: Courier New, Courier, monospace;">&lt;/VirtualHost&gt;</span><br />
+<span style="font-family: Courier New, Courier, monospace;"><br /></span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+Disable Apache´s default site.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ sudo a2dissite 000-default.conf</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">Site 000-default disabled.</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">To activate the new configuration, you need to run:</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">service apache2 reload</span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+Enable our site:</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee;"><span style="font-family: Courier New, Courier, monospace;">$ sudo a2ensite juliotrigo.conf</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee;"><span style="font-family: Courier New, Courier, monospace;">Enabling site juliotrigo.</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee;"><span style="font-family: Courier New, Courier, monospace;">To activate the new configuration, you need to run:</span></span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee;"><span style="font-family: Courier New, Courier, monospace;">service apache2 reload</span></span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+And restart Apache:</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ sudo /etc/init.d/apache2 stop</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">* Stopping web server apache2</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">*</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">$ sudo /etc/init.d/apache2 start</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">* Starting web server apache2</span></div>
+<div style="text-align: justify;">
+<span style="background-color: #eeeeee; font-family: Courier New, Courier, monospace;">*</span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+In our example, Apache will also serve <b>static files</b>. However, it is recommended to use a separate Web server for that.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+We are using mod_wsgi in <b>daemon mode</b>. For that reason, we need to add the <a href="https://code.google.com/p/modwsgi/wiki/ConfigurationDirectives#WSGIDaemonProcess"><span style="font-family: Courier New, Courier, monospace;">WSGIDaemonProcess</span></a> and <a href="https://code.google.com/p/modwsgi/wiki/ConfigurationDirectives#WSGIProcessGroup"><span style="font-family: Courier New, Courier, monospace;">WSGIProcessGroup</span></a> directives to create the daemon process, which will run the Django instance in it.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+We are also using <a href="http://www.virtualenv.org/"><b>virtualenv</b></a> in our project, that is why we need to add our environment's site-packages directory to the python path using the <span style="font-family: Courier New, Courier, monospace;">WSGIDaemonProcess</span> directive and supplying the python-path option.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+Finally, to say that mod_wsgi can only be used with the version of Python (major.minor) that it was compiled for. If we need to specify a version of Python different than the default version in the system, we can use the <a href="https://modwsgi.readthedocs.org/en/latest/configuration-directives/WSGIPythonHome.html"><span style="font-family: Courier New, Courier, monospace;">WSGIPythonHome</span></a> directive. This is a very interesting and complete <a href="https://groups.google.com/forum/#!topic/modwsgi/Rmgj8IcHC18">article</a> about how to use <span style="font-family: Courier New, Courier, monospace;">WSGIPythonHome</span> / <span style="font-family: Courier New, Courier, monospace;">WSGIPythonPath</span>.</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<span style="font-size: large;"><b>Other ways of deploying Django</b></span></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+In a new post, I will talk about how to deploy Django using:</div>
+<div style="text-align: justify;">
+- Nginx</div>
+<div style="text-align: justify;">
+- Gunicorn / uWSGI</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<b><span style="font-size: large;">Resources</span></b></div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+Some other resources can be found here:</div>
+<div style="text-align: justify;">
+<br /></div>
+<div style="text-align: justify;">
+<a href="https://code.google.com/p/modwsgi/wiki/InstallationInstructions">Google code mod_wsgi installation instructions</a></div>
+<div style="text-align: justify;">
+<a href="https://code.google.com/p/modwsgi/wiki/QuickConfigurationGuide">Google code mod_wsgi quick configuration guide</a></div>
+<div style="text-align: justify;">
+<a href="https://code.google.com/p/modwsgi/wiki/ConfigurationDirectives">Google code mod_wsgi configuration directives</a></div>
+<div style="text-align: justify;">
+<a href="https://code.google.com/p/modwsgi/wiki/IntegrationWithDjango">Google code mod_wsgi integration with django</a></div>
+<div style="text-align: justify;">
+<a href="https://docs.djangoproject.com/en/dev/howto/deployment/wsgi/modwsgi/">How to use Django with Apache and mod_wsgi</a></div>
